@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
     <ImageView
-        android:src="@drawable/huoying"
+        android:id="@+id/topNews_image"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:scaleType="centerCrop"/>
@@ -16,12 +16,13 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
         <TextView
-            android:textSize="25dp"
+            android:id="@+id/topNews_title"
+            android:textSize="25sp"
             android:textColor="#fff"
             android:maxLines="2"
             android:ellipsize="end"
-            android:text="标题标题标题标题标题标题标题标题标题标题标题标题"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:background="#41000000"/>
     </RelativeLayout>
 </FrameLayout>

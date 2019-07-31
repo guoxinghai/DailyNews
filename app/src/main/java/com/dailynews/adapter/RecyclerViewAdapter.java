@@ -9,15 +9,17 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.dailynews.R;
+import com.dailynews.gsonModel.BriefStory;
 
 import java.util.List;
 
 public class RecyclerViewAdapter extends RecyclerView.Adapter {
         //用来存取需要加载的数据的集合对象 这份代码的集合用于存储消息对象
-        List<String> dataList;
+        private List<BriefStory> dataList;
         //构造方法只需将数据集合传递进来即可
-        public RecyclerViewAdapter(List<String> messages){
+        public RecyclerViewAdapter(List<BriefStory> messages){
             this.dataList = messages;
         }
 
@@ -32,14 +34,17 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter {
     //onBindViewHolder()函数是用来将数据绑定到ViewHolder中的属性的，也可以在这为部件设置监听等事件
         @Override
         public void onBindViewHolder(RecyclerView.ViewHolder viewHolder,int i) {
-            final String message = dataList.get(i);
-            viewHolder.itemView.setOnClickListener(new View.OnClickListener(){
-
+            final BriefStory briefStory = dataList.get(i);
+            ViewHolder vh = (ViewHolder)viewHolder;
+            vh.itemView.setOnClickListener(new View.OnClickListener(){
                 @Override
                 public void onClick(View v) {
-                    Toast.makeText(v.getContext(),message,Toast.LENGTH_SHORT).show();
+                    Toast.makeText(v.getContext(),briefStory.getTitle(),Toast.LENGTH_SHORT).show();
                 }
             });
+            vh.textView.setText(briefStory.getTitle());
+            ImageView imageView = vh.imageView;
+            Glide.with(imageView.getContext()).load(briefStory.getImages()[0]).into(imageView);
         }
 
         //getItemCount()获取集合对象的大小
@@ -59,7 +64,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter {
             TextView textView;
             ImageView imageView;
             View itemView;
-            //构造函数获取一个itemView即cyclerView的布局子对象
+            //构造函数获取一个itemView即recyclerView的布局子对象
             public ViewHolder(@NonNull View itemView) {
                 super(itemView);
                 this.itemView = itemView;
