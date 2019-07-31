@@ -1,8 +1,11 @@
 package com.dailynews;
 
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Build;
+import android.preference.PreferenceManager;
 import android.support.v4.view.ViewPager;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -27,8 +30,9 @@ import me.relex.circleindicator.CircleIndicator;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.Response;
-
+//news为在sharedPreferences中的缓存
 public class MainActivity extends AppCompatActivity {
+    private SwipeRefreshLayout swipeRefreshLayout;
     private ViewPager viewPager;
     private ViewPagerAdapter viewPagerAdapter;
     private RecyclerViewAdapter recyclerViewAdapter;
@@ -41,6 +45,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
         //设置viewPager
         viewPagerAdapter = new ViewPagerAdapter(this,briefTopStories);
         viewPager = (ViewPager)findViewById(R.id.viewPager);
@@ -57,6 +62,14 @@ public class MainActivity extends AppCompatActivity {
         recyclerView.setAdapter(recyclerViewAdapter);
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.addItemDecoration(spacesItemDecoration);
+        //设置下拉刷新
+        swipeRefreshLayout = (SwipeRefreshLayout)findViewById(R.id.swipeRefreshLayout);
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                requestByServer();
+            }
+        });
         //将状态栏和背景融为一体
         if(Build.VERSION.SDK_INT >= 21){
             View decorView = getWindow().getDecorView();
@@ -70,8 +83,20 @@ public class MainActivity extends AppCompatActivity {
         requestNewsList();
 
     }
-    //请求并解析新闻列表
+    //请求并解析新闻列表(优先使用缓存中的内容)
     private void requestNewsList(){
+        //判断缓存
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        String data = sharedPreferences.getString("newslist",null);
+        if(data!=null){
+            setNewsList(data);
+        }else{
+            requestByServer();
+        }
+
+    }
+    //直接通过发送请求获取新闻内容
+    private void requestByServer(){
         HttpsUtil.sendOkHttpRequest(newsListAddress, new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
@@ -86,17 +111,27 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
-                String data = response.body().string();
-                final NewsList newsList = JsonUtil.handleNewsListResponse(data);
+                final String data = response.body().string();
+                //将data置入缓存
+                SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(MainActivity.this);
+                SharedPreferences.Editor editor = sharedPreferences.edit();
+                editor.putString("newslist",data);
+                editor.apply();
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        setStoriesList(newsList.getBriefStories());
-                        setTopStoriesList(newsList.getBriefTopStories());
+                        setNewsList(data);
+                        swipeRefreshLayout.setRefreshing(false);
                     }
                 });
             }
         });
+    }
+    //设置新闻列表
+    private void setNewsList(String data){
+        NewsList newsList = JsonUtil.handleNewsListResponse(data);
+        setStoriesList(newsList.getBriefStories());
+        setTopStoriesList(newsList.getBriefTopStories());
     }
     //设置stories列表
     private void setStoriesList(List<BriefStory> briefStoryList){

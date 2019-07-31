@@ -9,7 +9,6 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.dailynews.R;
-import com.dailynews.gsonModel.BriefStory;
 import com.dailynews.gsonModel.BriefTopStory;
 
 import java.util.List;
@@ -31,7 +30,7 @@ public class ViewPagerAdapter extends PagerAdapter {
     @Override
     public Object instantiateItem(ViewGroup container, int position) {
         BriefTopStory briefTopStory = mData.get(position);
-        View view = View.inflate(mContext, R.layout.topnews,null);
+        View view = View.inflate(mContext, R.layout.topnewslist,null);
         ImageView imageView = view.findViewById(R.id.topNews_image);
         TextView textView = view.findViewById(R.id.topNews_title);
         textView.setText(briefTopStory.getTitle());

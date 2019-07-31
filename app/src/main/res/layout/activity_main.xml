@@ -7,6 +7,14 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".MainActivity">
+    <android.support.v4.widget.SwipeRefreshLayout
+        android:id="@+id/swipeRefreshLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
@@ -22,12 +30,6 @@
             app:ci_drawable="@drawable/yellow_radius"
             app:ci_drawable_unselected="@drawable/blue_radius"/>
     </FrameLayout>
-
-    <ScrollView
-        android:scrollbars="none"
-        android:overScrollMode="never"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
     <LinearLayout
         android:orientation="vertical"
         android:layout_width="match_parent"
@@ -49,6 +51,6 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"/>
     </LinearLayout>
-    </ScrollView>
-
+    </LinearLayout>
+</android.support.v4.widget.SwipeRefreshLayout>
 </LinearLayout>
